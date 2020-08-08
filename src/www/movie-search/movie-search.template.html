@@ -1,0 +1,14 @@
+<form id="searchForm">
+  <input id="searchField" />
+  <button>Search</button>
+</form>
+
+<ul class="movies"><?movie@movies#?>
+    <li class="movie">
+    <span class="movie_title"><?=movie.Title?></span>
+    <img class="movie_poster"/>
+    <?attr src=movie.Poster?>
+    <time class="movie_year"><?=movie.Year?></time>
+    </li>
+<?/@?></ul>
+<?out *.ts?>

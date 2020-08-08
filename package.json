@@ -1,0 +1,33 @@
+{
+  "name": "showcase",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node --experimental-modules ./out/server.js",
+    "build": "npm run copy & tsc",
+    "build:watch": "npm run copy:watch & npm run style:watch & tsc -w",
+    "style": "sass ./src/www/style.scss ./out/www/style.css",
+    "style:watch": "sass --watch ./src/www/style.scss ./out/www/style.css",
+    "copy": "node ./node_modules/assetomat/index.js once",
+    "copy:watch": "node ./node_modules/assetomat/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "assets": [
+    {
+      "source": "src/assets/",
+      "target": "out/www/"
+    }
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@types/mime": "^2.0.2",
+    "@types/node": "^14.0.13",
+    "assetomat": "^1.1.1",
+    "mime": "^2.4.6",
+    "sass": "^1.26.10",
+    "typescript": "^3.9.5"
+  }
+}

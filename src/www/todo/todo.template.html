@@ -1,0 +1,29 @@
+<form id="taskForm">
+  <input id="taskField" />
+
+  <ul class="tasks"><?task:i@tasks#?>
+    <li class="task">
+      <input class="task_isCompleted" type="checkbox" /><?attr task.isCompleted?checked="checked"?><?attr id=task.completedId?><?attr value=i?>
+      <?attr task.completed?checked=checked ?>
+      <span class="task_name"><?=task.label?></span>
+      <input type="radio" hidden/><?attr id=task.removeId?><?attr value=i?>
+      <label class="task_remove"><?attr for=task.removeId?>X</label>
+    </li>
+  <?/@?></ul>
+  <div class="allTasks">
+    <input id="togglAll" type="checkbox" /><label for="togglAll" class="allTasks_selectLabel">Check All</label>
+    <span class="itemCount"><?=count#?></span>
+  </div>
+  <div class="taskFilters">
+    <div class="taskFilters_list">
+      <input name="filter" type="radio" id="showAll" value="all" checked hidden />
+      <label for="showAll" class="taskFilters_list_item">All</label>
+      <input name="filter" type="radio" id="showActive" value="active" hidden />
+      <label for="showActive" class="taskFilters_list_item">Active</label>
+      <input name="filter" type="radio" id="showCompleted" value="completed" hidden/>
+      <label for="showCompleted" class="taskFilters_list_item">Completed</label>
+    </div>
+    <button id="removeCompleted"><span>Remove Completed</span></button>
+  </div>
+</form>
+<?out *.ts?>

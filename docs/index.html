@@ -1,0 +1,227 @@
+<html>
+  <head>
+    <title>HTML Encoder Showcase</title>
+    <script src="index.js" type="module"></script>
+    <link rel="stylesheet" href="https://fonts.xz.style/serve/inter.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@exampledev/new.css@1.1.2/new.min.css" />
+    <link rel="stylesheet" type="text/css" href="style.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Khmer&display=swap" rel="stylesheet" />
+  </head>
+
+  <body>
+    <input type="radio" id="homeTab" name="tab" checked hidden />
+    <input type="radio" id="todoTab" name="tab" hidden />
+    <input type="radio" id="movieTab" name="tab" hidden />
+    <input type="radio" id="shoppingTab" name="tab" hidden />
+
+    <header>
+      <h1>HTML-Encoder Showcase</h1>
+      <nav>
+        <label for="homeTab">Home</label>
+        <label for="movieTab">Movie Search App</label>
+        <label for="todoTab">Todo App</label>
+        <label for="shoppingTab">Shopping App</label>
+      </nav>
+    </header>
+
+    <main>
+      <article class="homeTab">
+        <h2>So What this is all about</h2>
+        <p>
+          I wrote my
+          <a href="https://marketplace.visualstudio.com/items?itemName=odedshr.html-encoder">HTML-Encoder</a> as thought
+          experiment and it's kinda like a JSX alternative. The general idea is to write 100% valid HTML code that can
+          be rendered to Typescript/Javascript instructions that can later be render back on either the client or the
+          server side. Things get more complicated when I introduced "live" updates that allow you to make changes in
+          the HTML output with minimal DOM-rendering (it also provide you quick access to selected HTML element).
+        </p>
+        <p>
+          In this showcase I give a few quick examples of using my encoder. It was also a good test-case scenario for me
+          to try build something a bit more advanced than my original test-units.
+        </p>
+      </article>
+
+      <article class="movieTab">
+        <h2>Movie Search</h2>
+        <h3>Demo</h3>
+        <div id="movieApp"></div>
+        <details>
+          <summary>Code:</summary>
+          <h3>template.html:</h3>
+          <pre class="html">
+            <form id="searchForm">
+              <input id="searchField" />
+              <button>Search</button>
+            </form>
+            
+            <ul class="movies">
+              <?movie@movies#?>
+              <li class="movie">
+                <span class="movie_title"><?=movie.Title?></span>
+                <img class="movie_poster" />
+                <?attr src=movie.Poster?>
+                <time class="movie_year"><?=movie.Year?></time>
+              </li>
+              <?/@?>
+            </ul></pre>
+          <h3>Typescript:</h3>
+          <pre>
+            import { getNode } from './movie-search.template.js';
+            const url = /* URL goes here */;
+            const app = getNode({});
+  
+            export function initApp() {
+              const form = app.set.searchForm as unknown as HTMLFormElement;
+              const searchField = app.set.searchField as unknown as HTMLInputElement;
+              form.onsubmit = () => search(searchField.value) && false;
+              return app as Node;
+            }
+  
+            async function search(searchValue: string) {
+              const response = await fetch(`${url}&s=${searchValue}`);
+              const results = await response.json();
+              app.set.movies = results.Search;
+            }
+          </pre>
+        </details>
+      </article>
+      <article class="todoTab">
+        <h2>ToDo App</h2>
+        <h3>Demo</h3>
+        <div id="todoApp"></div>
+        <details>
+          <summary>Code:</summary>
+          <h3>template.html:</h3>
+          <pre class="html">
+            <form id="taskForm">
+              <input id="taskField" />
+            
+              <ul class="tasks">
+                <?task:i@tasks#?>
+                <li class="task">
+                  <input class="task_isCompleted" type="checkbox" />
+                  <?attr task.isCompleted?checked="checked"?>
+                  <?attr id=task.completedId?>
+                  <?attr value=i?>
+                  <?attr task.completed?checked=checked ?>
+                  <span class="task_name"><?=task.label?></span>
+                  <input type="radio" hidden />
+                  <?attr id=task.removeId?>
+                  <?attr value=i?>
+                  <label class="task_remove">
+                    <?attr for=task.removeId?>X</label>
+                </li>
+                <?/@?>
+              </ul>
+              <div class="allTasks">
+                <input id="togglAll" type="checkbox" /><label for="togglAll" class="allTasks_selectLabel">Check All</label>
+                <span class="itemCount"><?=count#?></span>
+              </div>
+              <div class="taskFilters">
+                <div class="taskFilters_list">
+                  <input name="filter" type="radio" id="showAll" value="all" checked hidden />
+                  <label for="showAll" class="taskFilters_list_item">All</label>
+                  <input name="filter" type="radio" id="showActive" value="active" hidden />
+                  <label for="showActive" class="taskFilters_list_item">Active</label>
+                  <input name="filter" type="radio" id="showCompleted" value="completed" hidden />
+                  <label for="showCompleted" class="taskFilters_list_item">Completed</label>
+                </div>
+                <button id="removeCompleted"><span>Remove Completed</span></button>
+              </div>
+            </form></pre>
+          <h3>Typescript:</h3>
+          <pre>
+          import { getNode } from './todo.template.js';
+          import initState, { State } from './state.js';
+          
+          type Task = { label: string; completed: boolean; removeId?: string; completedId?: string }
+          const state: State = initState({
+            tasks: [{
+              label: 'build application',
+              completed: false,
+            }, {
+              label: 'stylise ui',
+              completed: false,
+            }, {
+              label: 'add documentation',
+              completed: false,
+            }],
+            show: 'all'
+          });
+          
+          
+          const app = getNode({
+            count: getCountString(state.tasks.length), tasks: prepTasks(state.tasks, state.show)
+          });
+          
+          function getCountString(count: number): any {
+            if (count > 1) {
+              return `${count} items left`;
+            } else if (count === 1) {
+              return `Only 1 item left`
+            }
+            return '';
+          }
+          
+          function prepTasks(tasks: Task[], show: string): Task[] {
+            return tasks
+              .filter(task => (show == 'all') || (show == 'active' && !task.completed) || (show === 'completed' && task.completed))
+              .map((task, i) => ({ ...task, removeId: `remove_${i}`, completedId: `complete_${i}` }));
+          }
+          
+          export function initApp() {
+            const form = app.set.taskForm as unknown as HTMLFormElement;
+            form.addEventListener('change', evt => {
+              const source = evt.target as HTMLInputElement;
+              const sourceId = source.id;
+              
+              if (sourceId.indexOf('complete') === 0) {
+                const copy = state.tasks.slice(0);
+                const task: Task = copy[+source.value];
+                copy[+source.value] = { label: task.label, completed: !task.completed };
+                state.tasks = copy;
+              } else if (sourceId.indexOf('remove_') === 0) {
+                const copy = state.tasks.slice(0);
+                copy.splice(+source.value, 1);
+                state.tasks = copy;
+              } else if (source.name === 'filter') {
+                state.show = source.value;
+              }
+            });
+            (app.set.taskForm as unknown as HTMLFormElement).onsubmit = () => false;
+            
+            const taskField: HTMLInputElement = app.set.taskField as unknown as HTMLInputElement;
+            taskField.addEventListener('keyup', (evt) => {
+              if ((evt as KeyboardEvent).key === 'Enter') {
+                state.tasks = [{ label: taskField.value, completed: false }, ...state.tasks];
+                taskField.value = '';
+              }
+            });
+            
+            (app.set.removeCompleted as unknown as HTMLButtonElement).addEventListener('click', () => {
+              state.tasks = state.tasks.slice(0).filter((task: Task) => !task.completed);
+            });
+            
+            state.$?.tasks.add(tasks => refresh(tasks, state.show));
+            state.$?.show.add(show => refresh(state.tasks, show));
+            
+            return app as Node;
+          }
+          
+          
+          function refresh(tasks: Task[], show: 'all' | 'active' | 'completed') {
+            const filteredTasks = prepTasks(tasks, show);
+            app.set.tasks = filteredTasks as any;
+            app.set.count = getCountString(filteredTasks.length) as any;
+          }
+          </pre>
+        </details>
+      </article>
+      <article class="shoppingTab">
+        <h2>Shopping App</h2>
+        <h3>Demo</h3>
+        <div id="shoppingApp"></div>
+      </article>
+    </main>
+  </body>
+</html>

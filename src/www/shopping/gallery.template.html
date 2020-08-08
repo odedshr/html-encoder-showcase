@@ -1,0 +1,90 @@
+<form id="productsForm">
+  <section class="gallery_header">
+    <div class="gallery_title">Casa <sub>de</sub> Olaf</div>
+    <div class="cart">
+  <label for="showCart" class="cartSummary">
+    <div class="cartSummary_count"><?=cartCount#?></div>
+    <span class="cartSummary_action">View my bag</span>
+  </label>
+  <input type="checkbox" id="showCart" hidden disabled class="showCart_checkbox" />
+  <div class="cartWrapper">
+    <div class="cartContent">
+      <div class="cart_header">
+        <h2 class="cart_title">Review your basket</h2>
+        <label for="showCart" class="cart_close"><span>close</span></label>
+      </div>
+      <table class="cart_table">
+        <thead>
+          <tr>
+            <th> </th>
+            <th>Item</th>
+            <th>Price</th>
+            <th>Qty.</th>
+            <th>Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          <?item@cart#?>
+          <tr class="cartItem">
+            <td class="cartItem_imageTd">
+              <img class="cartItem_image" />
+              <?attr src=item.image ?>
+            </td>
+            <td class="cartItem_name"><?=item.name?></td>
+            <td class="cartItem_cost"><?=item.cost?></td>
+            <td class="cartItem_qty">
+              <button data-task="dec" class="cartItem_qty_dec"><?attr data-id=item.id?>-</button>
+              <input class="cartItem_qty_field" type="number" class="cartItem_qty_field"/>
+              <?attr value=item.qty?>
+              <button data-task="inc" class="cartItem_qty_inc"><?attr data-id=item.id?>+</button>
+
+              <button class="cartItem_remove_btn" data-task="remove">
+                <?attr data-id=item.id?>
+                <span>remove</span>
+              </button>
+            </td>
+            <td class="cartItem_totalCost"><?=item.totalCost?></td>
+          </tr>
+          <?/@?>
+        </tbody>
+        <tfoot>
+          <tr>
+            <td colspan="4"> </td>
+            <td class="cart_total"><?=cartCost#?></td>
+          </tr>
+        </tfoot>
+      </table>
+      <div class="cart_actions">
+        <button class="cart_removeAll" data-task="removeAll">Remove all items</button>
+        <button class="cart_checkout" data-task="checkout">Checkout</button>
+      </div>
+    </div>
+  </div>
+</div>
+  </section>
+  <div class="breadcrumbs">home > delivery > cakes</div>
+  <div class="section_title">All Cakes</div>
+  <div class="item_count">(<?=count#?> items)</div>
+
+  <ul class="gallery_items">
+  <?item@items#?>
+    <li class="product">
+      <?attr data-name=item.name?>
+      <?css !item.inStock?"product_outOfStock"?>
+
+      <img class="product_image" />
+      <?attr src=item.image ?>
+      <div class="product_actions">
+        <??item.inStock?>
+          <button data-task="add" class="product_action product_addBasket"><?attr data-id=item.id?><span>Add to basket</span></button>
+        <?/??>
+        </div>
+
+      <div class="product_summary">
+        <div class="product_name"><?=item.name?></div>
+        <div class="product_cost"><?=item.cost?></div>
+      </div>
+    </li><?/@?>
+  </ul>
+</form>
+<?out *.ts?>
