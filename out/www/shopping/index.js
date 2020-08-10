@@ -33,7 +33,7 @@ export function initApp() {
     const form = app.set.productsForm;
     form.onsubmit = () => false;
     form.addEventListener('submit', evt => {
-        const source = evt.submitter;
+        const source = (evt.submitter || document.activeElement);
         if (source) {
             const task = source.getAttribute('data-tasK');
             const id = source.getAttribute('data-id');
@@ -88,7 +88,13 @@ export function initApp() {
             showCart.setAttribute('disabled', 'disabled');
         }
     });
+    if (isSafari()) {
+        window.setTimeout(() => form.querySelectorAll('.product_action').forEach((btn) => btn.addEventListener('click', (evt) => (evt === null || evt === void 0 ? void 0 : evt.target).focus())), 0);
+    }
     return app;
+}
+function isSafari() {
+    return navigator.userAgent.toLowerCase().indexOf('safari/') > -1;
 }
 function updateProduct(id, action) {
     const copy = state.items.slice(0);

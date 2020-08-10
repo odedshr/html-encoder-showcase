@@ -36,8 +36,9 @@ export function initApp() {
   getData();
   const form = app.set.productsForm as unknown as HTMLFormElement;
   form.onsubmit = () => false;
+
   form.addEventListener('submit', evt => {
-    const source = (evt as any).submitter as HTMLButtonElement;
+    const source = ((evt as any).submitter || document.activeElement) as HTMLButtonElement;
     if (source) {
       const task = source.getAttribute('data-tasK');
       const id = source.getAttribute('data-id');
@@ -84,7 +85,21 @@ export function initApp() {
     }
   });
 
+
+  if (isSafari()) {
+    window.setTimeout(() =>
+      form.querySelectorAll<HTMLButtonElement>('.product_action').forEach(
+        (btn: HTMLButtonElement) => btn.addEventListener('click',
+          (evt: Event) => (evt?.target as HTMLButtonElement).focus()
+        )
+      ),
+      0);
+  }
   return app as Node;
+}
+
+function isSafari() {
+  return navigator.userAgent.toLowerCase().indexOf('safari/') > -1;
 }
 
 function updateProduct(id: string, action: (product: Product) => Product) {
